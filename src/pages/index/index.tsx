@@ -15,7 +15,7 @@ const index = () => {
       }).then((res) => {
         if (!res) {
           Taro.redirectTo({
-            url: "/pages/login/login",
+            url: "/pages/login/index",
           });
         }
       });

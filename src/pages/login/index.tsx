@@ -13,7 +13,7 @@ const login = () => {
     password,
   };
 
-//   token校验
+  //   token校验
   useEffect(() => {
     const token = Taro.getStorageSync("token") || null;
     if (token !== null) {
@@ -27,9 +27,9 @@ const login = () => {
             url: "/pages/index/index",
           });
         } else {
-            Taro.redirectTo({
-                url: "/pages/login/login",
-              });
+          Taro.redirectTo({
+            url: "/pages/login/index",
+          });
         }
       });
     }
@@ -61,6 +61,11 @@ const login = () => {
     }
   };
 
+  // 注册跳转
+  const goToReg = () => {
+    Taro.navigateTo({ url: "/pages/register/index" });
+  };
+
   const toastClose = () => {
     setIsShow(false);
   };
@@ -75,6 +80,7 @@ const login = () => {
           setUsername(v.trim());
         }}
         maxLength={15}
+        customStyle={{marginTop:'20px'}}
       ></OsInput>
       <OsInput
         type="password"
@@ -85,9 +91,13 @@ const login = () => {
           setPassword(v.trim());
         }}
         maxLength={15}
+        customStyle={{marginTop:'20px'}}
       ></OsInput>
-      <OsButton type="primary" size="block" onClick={login}>
+      <OsButton type="primary" size="block" onClick={login} customStyle={{marginTop:'20px'}}>
         登录
+      </OsButton>
+      <OsButton type="default" size="block" onClick={goToReg} customStyle={{marginTop:'20px'}}>
+        注册
       </OsButton>
 
       <OsToast text={toastText} isShow={isShow} onClose={toastClose}></OsToast>
