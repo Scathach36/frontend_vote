@@ -1,5 +1,6 @@
 import { View, Text } from "@tarojs/components";
 import Taro from "@tarojs/taro";
+import { OsTabs, OsTabsHeader, OsTabsHeaderItem, OsTabsPanel } from "ossaui";
 import { useEffect } from "react";
 import "./index.scss";
 
@@ -23,9 +24,21 @@ const index = () => {
   });
   return (
     <>
-      <View className="index">
-        <Text>Hello world!</Text>
-      </View>
+      {Taro.getStorageSync("role") == "0" && (
+        <>
+          <view>学生</view>
+        </>
+      )}
+      {Taro.getStorageSync("role") == "1" && (
+        <>
+          <view>教师</view>
+        </>
+      )}
+      {Taro.getStorageSync("role") == "2" && (
+      <>
+        <view>管理员</view>
+      </>
+      )}
     </>
   );
 };
