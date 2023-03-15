@@ -1,11 +1,11 @@
 import Taro from "@tarojs/taro";
+import { OsButton } from "ossaui";
 
 import { useEffect, useState } from "react";
 import "./index.scss";
 
 const index = () => {
-
-  //   token校验
+  // token校验
   useEffect(() => {
     const token = Taro.getStorageSync("token") || null;
     if (token !== null) {
@@ -23,9 +23,16 @@ const index = () => {
     }
   });
 
+  //添加新投票
+  const addVote = () => {
+    Taro.navigateTo({ url: "/pages/addVote/index" });
+  };
+
   return (
     <>
-      <view>首页 </view>
+      <OsButton type="primary" size="block" icon="add" onClick={addVote}>
+        创建投票
+      </OsButton>
     </>
   );
 };

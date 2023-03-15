@@ -1,0 +1,16 @@
+page {  
+    display: block;  
+    min-height: 100%;  
+    background-color: #f7f3f4;  
+  }
+.option {
+  position: relative;
+
+  .icon_Delete {
+    z-index: 999;
+    position: absolute;
+    left: 2%;
+    top: 50%;
+    transform: translate(0,-50%);
+  }
+}
