@@ -2,7 +2,6 @@ import Taro from "@tarojs/taro";
 import { OsButton } from "ossaui";
 
 import { useEffect, useState } from "react";
-import "./index.scss";
 
 const index = () => {
   // token校验

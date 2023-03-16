@@ -46,12 +46,12 @@ const login = () => {
         method: "POST",
         data,
       }).then((res) => {
-        if (!res.data.role) {
-          setToastText(res.data.msg);
+        if (!res.data.data.role) {
+          setToastText(res.data.data.msg);
           setIsShow(true);
         } else {
-          Taro.setStorageSync("token", res.data.token);
-          Taro.setStorageSync("role", res.data.role);
+          Taro.setStorageSync("token", res.data.data.token);
+          Taro.setStorageSync("role", res.data.data.role);
           setToastText("登录成功");
           setIsShow(true);
           Taro.redirectTo({
