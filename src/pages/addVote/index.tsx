@@ -1,11 +1,13 @@
 import { OsButton, OsDatePicker, OsIcon, OsInput, OsList, OsPicker } from "ossaui";
 import { useState } from "react";
 import "./index.scss";
+import moment from "moment";
 
 const AddVote = () => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [optionsArr, setOptionsArr] = useState<string[]>([""]);
+  const [dateComplete, setDateComplete] = useState(moment());
 
   //   添加选项
   const addOption = () => {
