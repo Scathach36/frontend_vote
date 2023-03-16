@@ -51,7 +51,7 @@ const login = () => {
           setIsShow(true);
         } else {
           Taro.setStorageSync("token", res.data.data.token);
-          Taro.setStorageSync("role", res.data.data.role);
+          Taro.setStorageSync("data", res.data.data);
           setToastText("登录成功");
           setIsShow(true);
           Taro.redirectTo({
