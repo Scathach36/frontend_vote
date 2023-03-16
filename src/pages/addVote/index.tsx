@@ -1,4 +1,12 @@
-import { OsButton, OsDatePicker, OsIcon, OsInput, OsList, OsPicker } from "ossaui";
+import {
+  OsButton,
+  OsDatePicker,
+  OsIcon,
+  OsInput,
+  OsList,
+  OsPicker,
+  OsSwitch,
+} from "ossaui";
 import { useState } from "react";
 import "./index.scss";
 import moment from "moment";
@@ -7,7 +15,14 @@ const AddVote = () => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [optionsArr, setOptionsArr] = useState<string[]>([""]);
-  const [dateComplete, setDateComplete] = useState(moment());
+  const [dateComplete, setDateComplete] = useState<string>(
+    moment().format("YYYY-MM-DD HH:mm")
+  );
+  const [multi, setMulti] = useState<boolean>(false);
+  const [anonymous, setAnonymous] = useState<boolean>(false);
+  const [range, setRange] = useState<string[]>([]);
+  const [vNormal, setVNormal] = useState(0);
+  const [classNumber, setClassNumber] = useState<string>("");
 
   //   添加选项
   const addOption = () => {
@@ -95,7 +110,29 @@ const AddVote = () => {
       </view>
 
       <view>
-        
+        <OsDatePicker
+          type="complete"
+          value={dateComplete}
+          start={moment().format("YYYY-MM-DD")}
+          onConfirm={(e) => {
+            setDateComplete(e.detail.value);
+          }}
+        >
+          <OsList title="截止日期" desc={dateComplete}></OsList>
+        </OsDatePicker>
+        <OsPicker
+          range={range}
+          value={vNormal}
+          onConfirm={() => setClassNumber(range[vNormal])}
+        >
+          <OsList title="班级" desc={range[vNormal]}></OsList>
+        </OsPicker>
+        <OsList title="多选投票">
+          <OsSwitch checked={multi} onChange={setMulti}></OsSwitch>
+        </OsList>
+        <OsList title="匿名投票">
+          <OsSwitch checked={anonymous} onChange={setAnonymous}></OsSwitch>
+        </OsList>
       </view>
 
       <OsButton
