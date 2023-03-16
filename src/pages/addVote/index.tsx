@@ -7,9 +7,10 @@ import {
   OsPicker,
   OsSwitch,
 } from "ossaui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./index.scss";
 import moment from "moment";
+import Taro from "@tarojs/taro";
 
 const AddVote = () => {
   const [title, setTitle] = useState<string>("");
@@ -21,8 +22,20 @@ const AddVote = () => {
   const [multi, setMulti] = useState<boolean>(false);
   const [anonymous, setAnonymous] = useState<boolean>(false);
   const [range, setRange] = useState<string[]>([]);
-  const [vNormal, setVNormal] = useState(0);
+  const [vNormal, setVNormal] = useState<any>(0);
   const [classNumber, setClassNumber] = useState<string>("");
+
+  useEffect(() => {
+    const data = Taro.getStorageSync("data");
+    Taro.request({
+      url: "http://localhost:8080/class/findClass",
+      method: "POST",
+      data: { number: data.number },
+    }).then((res) => {
+      console.log(res);
+      setRange(res.data.data.classNumber);
+    });
+  }, []);
 
   //   添加选项
   const addOption = () => {
@@ -45,7 +58,37 @@ const AddVote = () => {
 
   //   添加投票
   const addVote = () => {
-    console.log(optionsArr);
+    const dataVote = {
+      title,
+      description,
+      multi: multi ? 1 : 0,
+      anonymous: anonymous ? 1 : 0,
+      createBy: Taro.getStorageSync("data").name,
+      endTime: dateComplete + ":00",
+      classNumber: range[vNormal],
+    };
+    Taro.request({
+      url: "http://localhost:8080/vote/saveVote",
+      method: "POST",
+      data: dataVote,
+    }).then((res) => {
+      console.log(res);
+      const dataOptions: any[] = [];
+      optionsArr.forEach((item) => {
+        const option = {
+          voteId: res.data.id,
+          description: item,
+        };
+        dataOptions.push(option);
+      });
+      Taro.request({
+        url: "http://localhost:8080/vote/saveAllOptions",
+        method: "POST",
+        data: dataOptions,
+      }).then((res) => {
+        console.log("options", res);
+      });
+    });
   };
 
   return (
@@ -123,7 +166,10 @@ const AddVote = () => {
         <OsPicker
           range={range}
           value={vNormal}
-          onConfirm={() => setClassNumber(range[vNormal])}
+          onConfirm={(index) => {
+            setClassNumber(range[vNormal]);
+            setVNormal(index);
+          }}
         >
           <OsList title="班级" desc={range[vNormal]}></OsList>
         </OsPicker>
