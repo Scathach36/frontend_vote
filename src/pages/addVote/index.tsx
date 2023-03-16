@@ -1,4 +1,4 @@
-import { OsButton, OsIcon, OsInput, OsList, OsPicker } from "ossaui";
+import { OsButton, OsDatePicker, OsIcon, OsInput, OsList, OsPicker } from "ossaui";
 import { useState } from "react";
 import "./index.scss";
 
@@ -6,9 +6,17 @@ const AddVote = () => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [optionsArr, setOptionsArr] = useState<string[]>([""]);
+
   //   添加选项
   const addOption = () => {
     setOptionsArr([...optionsArr, ""]);
+  };
+
+  //   删除选项
+  const deleteOption = (index) => {
+    let options = [...optionsArr];
+    options.splice(index, 1);
+    setOptionsArr(options);
   };
 
   //   选项变更
@@ -41,6 +49,7 @@ const AddVote = () => {
           setDescription(v);
         }}
       ></OsInput>
+
       {optionsArr.map((item, index) => {
         return (
           <>
@@ -50,6 +59,9 @@ const AddVote = () => {
                 customStyle={{ background: "#FF5252", borderRadius: "50%" }}
                 size={32}
                 className="icon_Delete"
+                onClick={() => {
+                  deleteOption(index);
+                }}
               ></OsIcon>
               <OsInput
                 label="   "
@@ -63,19 +75,34 @@ const AddVote = () => {
           </>
         );
       })}
+
       <view className="container_AddOption">
-        <OsButton
-          type="default"
-          color="#FF5252"
-          bgColor="#fff"
-          icon="add"
-          size="block"
+        <OsList
+          type="custom"
+          desc="添加选项"
+          descColor="#FF5252"
           onClick={addOption}
         >
-          添加选项
-        </OsButton>
+          <OsIcon
+            type="add"
+            size={22}
+            color="#FF5252"
+            customStyle={{ marginRight: "10px" }}
+          ></OsIcon>
+        </OsList>
       </view>
-      <OsButton type="primary" size="block" onClick={addVote}>
+
+      <view>
+        
+      </view>
+
+      <OsButton
+        type="primary"
+        size="large"
+        shape="square"
+        onClick={addVote}
+        customStyle={{ margin: "20px auto" }}
+      >
         完成
       </OsButton>
     </>
