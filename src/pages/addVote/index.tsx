@@ -6,6 +6,7 @@ import {
   OsList,
   OsPicker,
   OsSwitch,
+  OsToast,
 } from "ossaui";
 import { useEffect, useState } from "react";
 import "./index.scss";
@@ -17,25 +18,40 @@ const AddVote = () => {
   const [description, setDescription] = useState<string>("");
   const [optionsArr, setOptionsArr] = useState<string[]>([""]);
   const [dateComplete, setDateComplete] = useState<string>(
-    moment().format("YYYY-MM-DD HH:mm")
+    moment().add(5, "minutes").format("YYYY-MM-DD HH:mm")
   );
   const [multi, setMulti] = useState<boolean>(false);
   const [anonymous, setAnonymous] = useState<boolean>(false);
   const [range, setRange] = useState<string[]>([]);
   const [vNormal, setVNormal] = useState<any>(0);
   const [classNumber, setClassNumber] = useState<string>("");
+  const [show, setShow] = useState<boolean>(false);
+  const [text, setText] = useState<string>("");
 
   useEffect(() => {
     const data = Taro.getStorageSync("data");
-    Taro.request({
-      url: "http://localhost:8080/class/findClass",
-      method: "POST",
-      data: { number: data.number },
-    }).then((res) => {
-      console.log(res);
-      setRange(res.data.data.classNumber);
-    });
+    const role = data.role;
+    if (role == 2) {
+      Taro.request({
+        url: "http://localhost:8080/class/getClass",
+        method: "GET",
+      }).then((res) => {
+        setRange(res.data.data.classNumber);
+      });
+    } else {
+      Taro.request({
+        url: "http://localhost:8080/class/findClass",
+        method: "POST",
+        data: { number: data.number },
+      }).then((res) => {
+        setRange(res.data.data.classNumber);
+      });
+    }
   }, []);
+
+  useEffect(() => {
+    setClassNumber(range[vNormal]);
+  }, [range, vNormal]);
 
   //   添加选项
   const addOption = () => {
@@ -58,6 +74,30 @@ const AddVote = () => {
 
   //   添加投票
   const addVote = () => {
+    // 内容校验
+    if (title.length == 0) {
+      setShow(true);
+      setText("未输入标题！");
+      return;
+    }
+    if (optionsArr.length == 0) {
+      setShow(true);
+      setText("至少要有一个选项！");
+      return;
+    }
+    optionsArr.forEach((item) => {
+      if (item.length == 0) {
+        setShow(true);
+        setText("选项不能为空！");
+        return;
+      }
+    });
+    if (classNumber.length == 0) {
+      setShow(true);
+      setText("未选择班级！");
+      return;
+    }
+
     const dataVote = {
       title,
       description,
@@ -65,14 +105,13 @@ const AddVote = () => {
       anonymous: anonymous ? 1 : 0,
       createBy: Taro.getStorageSync("data").name,
       endTime: dateComplete + ":00",
-      classNumber: range[vNormal],
+      classNumber,
     };
     Taro.request({
       url: "http://localhost:8080/vote/saveVote",
       method: "POST",
       data: dataVote,
     }).then((res) => {
-      console.log(res);
       const dataOptions: any[] = [];
       optionsArr.forEach((item) => {
         const option = {
@@ -86,7 +125,13 @@ const AddVote = () => {
         method: "POST",
         data: dataOptions,
       }).then((res) => {
-        console.log("options", res);
+        if (res.data.code == 200) {
+          setShow(true);
+          setText("创建新投票成功!");
+          setTimeout(() => {
+            Taro.navigateBack();
+          }, 2000);
+        }
       });
     });
   };
@@ -190,6 +235,14 @@ const AddVote = () => {
       >
         完成
       </OsButton>
+
+      <OsToast
+        isShow={show}
+        text={text}
+        onClose={() => {
+          setShow(false);
+        }}
+      ></OsToast>
     </>
   );
 };

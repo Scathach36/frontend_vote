@@ -81,21 +81,21 @@ export default () => {
 
   return (
     <View>
-      {Taro.getStorageSync("role") == 0 && (
+      {Taro.getStorageSync("data").role == 0 && (
         <OsTabBar
           tabsArr={tabsArrForStudent}
           activeTabIdx={current}
           onClick={onChange}
         />
       )}
-      {Taro.getStorageSync("role") == 1 && (
+      {Taro.getStorageSync("data").role == 1 && (
         <OsTabBar
           tabsArr={tabsArrForTeacher}
           activeTabIdx={current}
           onClick={onChange}
         />
       )}
-      {Taro.getStorageSync("role") == 2 && (
+      {Taro.getStorageSync("data").role == 2 && (
         <OsTabBar
           tabsArr={tabsArrForAdmin}
           activeTabIdx={current}
