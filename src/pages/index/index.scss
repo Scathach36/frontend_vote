@@ -1,5 +1,21 @@
-page {  
-    display: block;  
-    min-height: 100%;  
-    background-color: #f7f3f4;  
-  }
+page {
+  display: block;
+  min-height: 100%;
+  background-color: #f7f3f4;
+}
+
+.btn_Add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  right: 40px;
+  bottom: 120px;
+  width: 70px;
+  height: 70px;
+  background-color: rgb(221, 26, 33);
+  color: #fff;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  z-index: 999;
+}

@@ -1,5 +1,6 @@
+import { View } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { OsButton, OsList, OsTag } from "ossaui";
+import { OsButton, OsIcon, OsList, OsTag } from "ossaui";
 import { useEffect, useState } from "react";
 import "./index.scss";
 
@@ -95,9 +96,11 @@ const index = () => {
   return (
     <>
       {role !== "0" && (
-        <OsButton type="primary" size="block" icon="add" onClick={addVote}>
-          创建投票
-        </OsButton>
+        <>
+          <View onClick={addVote} className="btn_Add">
+            <OsIcon type="add" size={36} color="#fff"></OsIcon>
+          </View>
+        </>
       )}
       {sortedVoteList.length > 0
         ? sortedVoteList.map((item, index) => {
