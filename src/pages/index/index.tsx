@@ -1,6 +1,6 @@
 import { View } from "@tarojs/components";
-import Taro from "@tarojs/taro";
-import { OsButton, OsIcon, OsList, OsTag } from "ossaui";
+import Taro, { usePullDownRefresh } from "@tarojs/taro";
+import { OsIcon, OsList, OsSearch, OsTag } from "ossaui";
 import { useEffect, useState } from "react";
 import "./index.scss";
 
@@ -27,8 +27,8 @@ const index = () => {
     }
   });
 
-  // 首次进入、刷新触发
-  useEffect(() => {
+  // 数组初始化
+  const initVoteList = () => {
     const data = Taro.getStorageSync("data");
     const role = data.role;
     setRole(data.role);
@@ -71,6 +71,15 @@ const index = () => {
         },
       });
     }
+  };
+
+  usePullDownRefresh(() => {
+    initVoteList();
+  });
+
+  // 首次进入、刷新触发
+  useEffect(() => {
+    initVoteList();
   }, []);
 
   // voteList数组监控
@@ -93,8 +102,35 @@ const index = () => {
     });
   };
 
+  // 标题查询
+  let time: any = null;
+  const searchByTiele = (e, value) => {
+    console.log("changed!");
+    if (time !== null) {
+      clearTimeout(time);
+    }
+    time = setTimeout(() => {
+      Taro.request({
+        url: "http://localhost:8080/vote/findAllByTitle",
+        method: "POST",
+        data: { title: value },
+        success: (res) => {
+          if (res.data.list) {
+            setVoteList(res.data.list);
+          }
+        },
+      });
+    }, 800);
+  };
+
   return (
     <>
+      <OsSearch
+        placeholder="投票标题搜索"
+        onChange={(e, value) => {
+          searchByTiele(e, value);
+        }}
+      ></OsSearch>
       {role !== "0" && (
         <>
           <View onClick={addVote} className="btn_Add">
