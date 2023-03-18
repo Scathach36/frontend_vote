@@ -1,6 +1,6 @@
 import { OsTabBar } from "ossaui";
 import "../../node_modules/ossaui/dist/style/components/tab-bar.scss";
-import "ossaui/dist/style/components/icon.scss";
+import "./custom.scss";
 import { useState } from "react";
 import { View } from "@tarojs/components";
 import Taro from "@tarojs/taro";
