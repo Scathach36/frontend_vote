@@ -1,8 +1,7 @@
 import Taro from "@tarojs/taro";
-import { OsButton, OsCountdown, OsList } from "ossaui";
-import { View } from "@tarojs/components";
-
+import { OsButton, OsList, OsTag } from "ossaui";
 import { useEffect, useState } from "react";
+import "./index.scss";
 
 const index = () => {
   const [role, setRole] = useState<string>("");
@@ -83,8 +82,8 @@ const index = () => {
             <OsList
               title={item.title}
               subTitle={
-                item.description.length > 7
-                  ? item.description.substring(0, 6) + "..."
+                item.description.length > 18
+                  ? item.description.substring(0, 17) + "..."
                   : item.description
               }
               type="custom"
@@ -94,42 +93,13 @@ const index = () => {
               }}
             >
               {nowTime >= endTime ? (
-                <View>已截止</View>
+                <OsTag type="primary" color="error">
+                  已截止
+                </OsTag>
               ) : (
-                <OsCountdown
-                  targetDate={item.endTime}
-                  onEnd={() => {
-                    console.log("倒计时结束");
-                  }}
-                >
-                  {(f) => (
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-end",
-                      }}
-                    >
-                      <View style={{}}>by {item.createBy}</View>
-                      <View
-                        style={{
-                          color: "#666",
-                          fontSize: "12px",
-                        }}
-                      >
-                        离截止还有
-                        {f.days +
-                          "天" +
-                          f.hours +
-                          "小时" +
-                          f.minutes +
-                          "分" +
-                          f.seconds +
-                          "秒"}
-                      </View>
-                    </View>
-                  )}
-                </OsCountdown>
+                <OsTag type="primary" color="#66CC66">
+                  进行中
+                </OsTag>
               )}
             </OsList>
           </>
