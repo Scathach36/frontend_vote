@@ -127,10 +127,10 @@ const AddVote = () => {
       }).then((res) => {
         if (res.data.code == 200) {
           setShow(true);
-          setText("创建新投票成功!");
+          setText("创建新投票成功! 1秒后返回页面");
           setTimeout(() => {
             Taro.navigateBack();
-          }, 2000);
+          }, 1000);
         }
       });
     });
