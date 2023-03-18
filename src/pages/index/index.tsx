@@ -45,12 +45,37 @@ const index = () => {
         },
       });
     }
+    // 教师获取投票列表
+    if (role == 1) {
+      Taro.request({
+        url: "http://localhost:8080/vote/findAllByCreate",
+        method: "POST",
+        data: { createBy: data.name },
+        success: (res) => {
+          if (res.data.list) {
+            setVoteList(res.data.list);
+          }
+        },
+      });
+    }
+    // 管理员获取投票列表
+    if (role == 2) {
+      Taro.request({
+        url: "http://localhost:8080/vote/getVote",
+        method: "GET",
+        success: (res) => {
+          if (res.data) {
+            setVoteList(res.data);
+          }
+        },
+      });
+    }
   }, []);
 
   // voteList数组监控
   useEffect(() => {
     const sortedList = voteList.sort((a, b) => {
-      return b.endTime > a.endTime ? -1 : 1;
+      return b.endTime < a.endTime ? -1 : 1;
     });
     setSortedVoteList(sortedList);
   }, [voteList]);
@@ -74,37 +99,39 @@ const index = () => {
           创建投票
         </OsButton>
       )}
-      {sortedVoteList.map((item, index) => {
-        const nowTime = new Date().valueOf();
-        const endTime = new Date(item.endTime).valueOf();
-        return (
-          <>
-            <OsList
-              title={item.title}
-              subTitle={
-                item.description.length > 18
-                  ? item.description.substring(0, 17) + "..."
-                  : item.description
-              }
-              type="custom"
-              rightIcon="arrows"
-              onClick={() => {
-                goToDetail(index);
-              }}
-            >
-              {nowTime >= endTime ? (
-                <OsTag type="primary" color="error">
-                  已截止
-                </OsTag>
-              ) : (
-                <OsTag type="primary" color="#66CC66">
-                  进行中
-                </OsTag>
-              )}
-            </OsList>
-          </>
-        );
-      })}
+      {sortedVoteList.length > 0
+        ? sortedVoteList.map((item, index) => {
+            const nowTime = new Date().valueOf();
+            const endTime = new Date(item.endTime).valueOf();
+            return (
+              <>
+                <OsList
+                  title={item.title}
+                  subTitle={
+                    item.description.length > 18
+                      ? item.description.substring(0, 17) + "..."
+                      : item.description
+                  }
+                  type="custom"
+                  rightIcon="arrows"
+                  onClick={() => {
+                    goToDetail(index);
+                  }}
+                >
+                  {nowTime >= endTime ? (
+                    <OsTag type="primary" color="error">
+                      已截止
+                    </OsTag>
+                  ) : (
+                    <OsTag type="primary" color="#66CC66">
+                      进行中
+                    </OsTag>
+                  )}
+                </OsList>
+              </>
+            );
+          })
+        : null}
     </>
   );
 };
