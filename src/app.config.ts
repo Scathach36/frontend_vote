@@ -4,7 +4,8 @@ export default defineAppConfig({
     'pages/index/index',
     'pages/register/index',
     'pages/user/index',
-    'pages/addVote/index'
+    'pages/addVote/index',
+    'pages/voteDetail/index'
   ],
   window: {
     backgroundTextStyle: 'light',
