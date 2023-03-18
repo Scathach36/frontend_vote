@@ -51,9 +51,9 @@ const index = () => {
   // voteList数组监控
   useEffect(() => {
     const sortedList = voteList.sort((a, b) => {
-      return b.endTime < a.endTime ? -1 : 1;
+      return b.endTime > a.endTime ? -1 : 1;
     });
-    setSortedVoteList(voteList);
+    setSortedVoteList(sortedList);
   }, [voteList]);
 
   //添加新投票
