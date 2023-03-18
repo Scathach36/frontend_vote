@@ -61,6 +61,13 @@ const index = () => {
     Taro.navigateTo({ url: "/pages/addVote/index" });
   };
 
+  // 跳转投票详情页面
+  const goToDetail = (index) => {
+    Taro.navigateTo({
+      url: "/pages/voteDetail/index?id=" + sortedVoteList[index].id,
+    });
+  };
+
   return (
     <>
       {role !== "0" && (
@@ -83,7 +90,7 @@ const index = () => {
               type="custom"
               rightIcon="arrows"
               onClick={() => {
-                console.log(index);
+                goToDetail(index);
               }}
             >
               {nowTime >= endTime ? (
