@@ -35,7 +35,7 @@ export default () => {
       icon: "subject",
       selectedIcon: "subject-pressed",
       text: "投票统计",
-      path: "/pages/index/index",
+      path: "/pages/voteCount/index",
     },
     {
       icon: "user",

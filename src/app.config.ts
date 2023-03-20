@@ -5,7 +5,8 @@ export default defineAppConfig({
     'pages/register/index',
     'pages/user/index',
     'pages/addVote/index',
-    'pages/voteDetail/index'
+    'pages/voteDetail/index',
+    'pages/voteCount/index'
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -23,6 +24,10 @@ export default defineAppConfig({
       {
         pagePath: "pages/user/index",
         text: "我的"
+      },
+      {
+        pagePath: "pages/voteCount/index",
+        text: "投票统计"
       }
     ]
   }
