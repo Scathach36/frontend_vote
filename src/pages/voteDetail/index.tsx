@@ -15,8 +15,8 @@ import "./index.scss";
 const VoteDetail = () => {
   const [detail, setDetail] = useState<any>();
   const [options, setOptions] = useState<any[]>([]);
-  const [radioValue, setRadioValue] = useState<string>("");
-  const [checkBoxValue, setCheckBoxValue] = useState<string[]>([]);
+  const [radioValue, setRadioValue] = useState<number>(0);
+  const [checkBoxValue, setCheckBoxValue] = useState<number[]>([]);
   const [disable, setDisable] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
   const [text, setText] = useState<string>("");
@@ -46,11 +46,55 @@ const VoteDetail = () => {
 
   //   判断选项是否禁用
   useEffect(() => {
-    // 判断时间是否过期
     if (detail) {
+      //   console.log(detail);
       const nowTime = new Date().valueOf();
       const endTime = new Date(detail.endTime).valueOf();
-      setDisable(nowTime >= endTime ? true : false);
+
+      // 判断时间是否过期
+      if (nowTime >= endTime) {
+        setDisable(true);
+        return;
+      }
+      // 判断自己是否为创建者
+      if (detail.createBy == data.name) {
+        setDisable(true);
+        return;
+      }
+      // 判断是否已经投过
+      Taro.request({
+        url: "http://localhost:8080/vote/existsByUserId",
+        method: "POST",
+        data: { userId: data.id, voteId: id },
+        success: (res) => {
+          setDisable(res.data.exist);
+
+          if (res.data.exist) {
+            const list = res.data.list;
+
+            // 单选情况
+            if (detail.multi == 0) {
+              options.forEach((item, index) => {
+                if (item.id == list[0].optionId) {
+                  setRadioValue(index);
+                }
+              });
+            }
+            // 多选情况
+            if (detail.multi == 1) {
+              let checkList: number[] = [];
+              list.forEach((listItem) => {
+                options.forEach((item, index) => {
+                  if (item.id == listItem.optionId) {
+                    checkList.push(index);
+                  }
+                });
+              });
+              setCheckBoxValue(checkList);
+            }
+          }
+        },
+      });
     }
   }, [detail]);
 
@@ -60,7 +104,7 @@ const VoteDetail = () => {
 
     // 单选情况
     if (detail.multi == 0) {
-      const index: number = Number(radioValue);
+      const index: number = radioValue;
       saveList.push({
         voteId: id,
         optionId: options[index].id,
@@ -141,7 +185,8 @@ const VoteDetail = () => {
                           value={radioValue}
                           optionValue={index}
                           onClick={setRadioValue}
-                          disabled={disable}
+                          //   disabled={disable}
+                          readonly={disable}
                         >
                           {item.description}
                         </OsRadioOption>
