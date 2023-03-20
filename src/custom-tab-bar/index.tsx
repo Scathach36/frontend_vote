@@ -1,13 +1,15 @@
 import { OsTabBar } from "ossaui";
 import "../../node_modules/ossaui/dist/style/components/tab-bar.scss";
 import "./custom.scss";
-import { useState } from "react";
-import { View } from "@tarojs/components";
+import { useDispatch, useSelector } from "react-redux";
 import Taro from "@tarojs/taro";
+import { View } from "@tarojs/components";
 
 export default () => {
-  // 需要使用全局状态管理current，因为每个页面的tabbar都是不同的实例
-  const [current, setCurrent] = useState<number>(0);
+  const current = useSelector((state: any) => state.current);
+  const dispatch = useDispatch();
+
+  console.log(current);
 
   const tabsArrForStudent: any[] = [
     {
@@ -76,7 +78,7 @@ export default () => {
     Taro.switchTab({
       url: item.path,
     });
-    setCurrent(index);
+    dispatch({ type: "SETCURRENTVALUE", current: index });
   };
 
   return (
@@ -84,21 +86,21 @@ export default () => {
       {Taro.getStorageSync("data").role == 0 && (
         <OsTabBar
           tabsArr={tabsArrForStudent}
-          activeTabIdx={current}
+          activeTabIdx={current.current}
           onClick={onChange}
         />
       )}
       {Taro.getStorageSync("data").role == 1 && (
         <OsTabBar
           tabsArr={tabsArrForTeacher}
-          activeTabIdx={current}
+          activeTabIdx={current.current}
           onClick={onChange}
         />
       )}
       {Taro.getStorageSync("data").role == 2 && (
         <OsTabBar
           tabsArr={tabsArrForAdmin}
-          activeTabIdx={current}
+          activeTabIdx={current.current}
           onClick={onChange}
         />
       )}
