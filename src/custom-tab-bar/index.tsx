@@ -9,8 +9,6 @@ export default () => {
   const current = useSelector((state: any) => state.current);
   const dispatch = useDispatch();
 
-  console.log(current);
-
   const tabsArrForStudent: any[] = [
     {
       icon: "home",
