@@ -7,6 +7,7 @@ import {
   OsList,
   OsRadio,
   OsRadioOption,
+  OsTag,
   OsToast,
 } from "ossaui";
 import { useEffect, useState } from "react";
@@ -164,7 +165,17 @@ const VoteDetail = () => {
               (detail.multi == 0 ? "单选" : "多选") +
               (detail.anonymous == 0 ? "" : "  匿名投票")
             }
-          ></OsList>
+          >
+            {disable ? (
+              <OsTag type="primary" color="#66CC66">
+                已参与
+              </OsTag>
+            ) : (
+              <OsTag type="primary" color="error">
+                未参与
+              </OsTag>
+            )}
+          </OsList>
           {detail.description ? (
             <OsList title="补充描述" subTitle={detail.description}></OsList>
           ) : null}
@@ -185,7 +196,6 @@ const VoteDetail = () => {
                           value={radioValue}
                           optionValue={index}
                           onClick={setRadioValue}
-                          //   disabled={disable}
                           readonly={disable}
                         >
                           {item.description}
@@ -205,7 +215,6 @@ const VoteDetail = () => {
                           value={checkBoxValue}
                           optionValue={index}
                           onClick={setCheckBoxValue}
-                          disabled={disable}
                         >
                           {item.description}
                         </OsCheckboxOption>
