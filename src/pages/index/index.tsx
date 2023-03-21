@@ -8,6 +8,7 @@ const index = () => {
   const [role, setRole] = useState<string>("");
   const [voteList, setVoteList] = useState<any[]>([]);
   const [sortedVoteList, setSortedVoteList] = useState<any[]>([]);
+  const [showList, setShowList] = useState<any[]>([]);
 
   // token校验
   useEffect(() => {
@@ -88,6 +89,7 @@ const index = () => {
       return b.endTime < a.endTime ? -1 : 1;
     });
     setSortedVoteList(sortedList);
+    setShowList(sortedList);
   }, [voteList]);
 
   //添加新投票
@@ -105,21 +107,18 @@ const index = () => {
   // 标题查询
   let time: any = null;
   const searchByTiele = (e, value) => {
-    console.log("changed!");
+    const reg = new RegExp(value);
+    let newList: any[] = [];
     if (time !== null) {
       clearTimeout(time);
     }
     time = setTimeout(() => {
-      Taro.request({
-        url: "http://localhost:8080/vote/findAllByTitle",
-        method: "POST",
-        data: { title: value },
-        success: (res) => {
-          if (res.data.list) {
-            setVoteList(res.data.list);
-          }
-        },
+      sortedVoteList.forEach((item) => {
+        if (reg.test(item.title)) {
+          newList.push(item);
+        }
       });
+      setShowList(newList);
     }, 800);
   };
 
@@ -138,8 +137,8 @@ const index = () => {
           </View>
         </>
       )}
-      {sortedVoteList.length > 0
-        ? sortedVoteList.map((item, index) => {
+      {showList.length > 0
+        ? showList.map((item, index) => {
             const nowTime = new Date().valueOf();
             const endTime = new Date(item.endTime).valueOf();
             return (
