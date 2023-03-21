@@ -1,12 +1,13 @@
 export default defineAppConfig({
   pages: [
+    'pages/echarts/index',
     'pages/login/index',
     'pages/index/index',
     'pages/register/index',
     'pages/user/index',
     'pages/addVote/index',
     'pages/voteDetail/index',
-    'pages/voteCount/index'
+    'pages/voteCount/index',
   ],
   window: {
     backgroundTextStyle: 'light',
