@@ -5,6 +5,7 @@ import {
   OsCheckbox,
   OsCheckboxOption,
   OsList,
+  OsModal,
   OsRadio,
   OsRadioOption,
   OsTag,
@@ -21,6 +22,7 @@ const VoteDetail = () => {
   const [disable, setDisable] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
   const [text, setText] = useState<string>("");
+  const [showBase, setShowBase] = useState(false);
   const router = useRouter();
   const data = Taro.getStorageSync("data");
   const id = router.params.id; //投票id
@@ -155,6 +157,28 @@ const VoteDetail = () => {
     });
   };
 
+  //   删除投票
+  const deleteVote = () => {
+    Taro.request({
+      url: "http://localhost:8080/vote/deleteVoteById",
+      method: "POST",
+      data: [{ id: detail.id }],
+      success: (res) => {
+        if (res) {
+          setText(res.data.msg);
+          setShowBase(false);
+          setShow(true);
+          setTimeout(() => {
+            Taro.navigateBack();
+          }, 800);
+        }
+      },
+      fail: (res) => {
+        console.log(res);
+      },
+    });
+  };
+
   return (
     <>
       {detail ? (
@@ -247,6 +271,26 @@ const VoteDetail = () => {
         完成投票
       </OsButton>
 
+      {data.role != 0 && (
+        <View
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <OsButton
+            type="default"
+            size="large"
+            color="#DD1A21"
+            bgColor="#FFF"
+            onClick={() => setShowBase(true)}
+          >
+            删除投票
+          </OsButton>
+        </View>
+      )}
+
       <OsToast
         isShow={show}
         text={text}
@@ -254,6 +298,17 @@ const VoteDetail = () => {
           setShow(false);
         }}
       ></OsToast>
+
+      <OsModal
+        title="删除投票"
+        cancelText="取消"
+        confirmText="确定"
+        content="确定要删除该投票吗？"
+        isShow={showBase}
+        onCancel={() => setShowBase(false)}
+        onClose={() => setShowBase(false)}
+        onConfirm={() => deleteVote()}
+      ></OsModal>
     </>
   );
 };
