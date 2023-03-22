@@ -1,6 +1,5 @@
 export default defineAppConfig({
   pages: [
-    'pages/echarts/index',
     'pages/login/index',
     'pages/index/index',
     'pages/register/index',
@@ -8,6 +7,7 @@ export default defineAppConfig({
     'pages/addVote/index',
     'pages/voteDetail/index',
     'pages/voteCount/index',
+    'pages/echarts/index',
   ],
   window: {
     backgroundTextStyle: 'light',
