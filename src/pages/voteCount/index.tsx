@@ -37,16 +37,31 @@ const VoteCount = () => {
   }, [voteList]);
 
   useEffect(() => {
-    Taro.request({
-      url: "http://localhost:8080/vote/findAllByCreate",
-      method: "POST",
-      data: { createBy: data.name },
-      success: (res) => {
-        if (res.data.list) {
-          setVoteList(res.data.list);
-        }
-      },
-    });
+    // 教师
+    if (data.role == 1) {
+      Taro.request({
+        url: "http://localhost:8080/vote/findAllByCreate",
+        method: "POST",
+        data: { createBy: data.name },
+        success: (res) => {
+          if (res.data.list) {
+            setVoteList(res.data.list);
+          }
+        },
+      });
+    }
+    // 管理员
+    if (data.role == 2) {
+      Taro.request({
+        url: "http://localhost:8080/vote/getVote",
+        method: "GET",
+        success: (res) => {
+          if (res.data) {
+            setVoteList(res.data);
+          }
+        },
+      });
+    }
   }, []);
 
   // 标题查询
