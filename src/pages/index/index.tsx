@@ -1,6 +1,16 @@
 import { View } from "@tarojs/components";
 import Taro, { usePullDownRefresh } from "@tarojs/taro";
-import { OsIcon, OsList, OsSearch, OsTag } from "ossaui";
+import {
+  OsCheckbox,
+  OsCheckboxOption,
+  OsIcon,
+  OsList,
+  OsModal,
+  OsSearch,
+  OsSwitch,
+  OsTag,
+  OsToast,
+} from "ossaui";
 import { useEffect, useState } from "react";
 import "./index.scss";
 
@@ -9,6 +19,11 @@ const index = () => {
   const [voteList, setVoteList] = useState<any[]>([]);
   const [sortedVoteList, setSortedVoteList] = useState<any[]>([]);
   const [showList, setShowList] = useState<any[]>([]);
+  const [canDelete, setCanDelete] = useState<boolean>(false);
+  const [checkBoxValue, setCheckBoxValue] = useState<number[]>([]);
+  const [showBase, setShowBase] = useState<boolean>(false);
+  const [show, setShow] = useState<boolean>(false);
+  const [text, setText] = useState<string>("");
 
   // token校验
   useEffect(() => {
@@ -122,6 +137,23 @@ const index = () => {
     }, 800);
   };
 
+  // 投票批量删除
+  const deleteVotes = () => {
+    console.log("checkBoxValue", checkBoxValue);
+    Taro.request({
+      url: "http://localhost:8080/vote/deleteAllByIds",
+      method: "POST",
+      data: { ids: checkBoxValue },
+      success: (res) => {
+        if (res.statusCode == 200) {
+          setShowBase(false);
+          setText(res.data.msg);
+          setShow(true);
+        }
+      },
+    });
+  };
+
   return (
     <>
       <OsSearch
@@ -132,44 +164,89 @@ const index = () => {
       ></OsSearch>
       {role !== "0" && (
         <>
-          <View onClick={addVote} className="btn_Add">
-            <OsIcon type="add" size={36} color="#fff"></OsIcon>
-          </View>
+          {canDelete ? (
+            <View onClick={() => setShowBase(true)} className="btn_Delete">
+              √
+            </View>
+          ) : (
+            <View onClick={addVote} className="btn_Add">
+              <OsIcon type="add" size={36} color="#fff"></OsIcon>
+            </View>
+          )}
+          <OsList title="批量删除" customStyle={{ marginBottom: "10px" }}>
+            <OsSwitch checked={canDelete} onChange={setCanDelete}></OsSwitch>
+          </OsList>
         </>
       )}
-      {showList.length > 0
-        ? showList.map((item, index) => {
-            const nowTime = new Date().valueOf();
-            const endTime = new Date(item.endTime).valueOf();
-            return (
-              <>
-                <OsList
-                  title={item.title}
-                  subTitle={
-                    item.description.length > 18
-                      ? item.description.substring(0, 17) + "..."
-                      : item.description
-                  }
-                  type="custom"
-                  rightIcon="arrows"
-                  onClick={() => {
-                    goToDetail(index);
-                  }}
-                >
-                  {nowTime >= endTime ? (
-                    <OsTag type="primary" color="error">
-                      已截止
-                    </OsTag>
-                  ) : (
-                    <OsTag type="primary" color="#66CC66">
-                      进行中
-                    </OsTag>
-                  )}
-                </OsList>
-              </>
-            );
-          })
-        : null}
+      <OsCheckbox>
+        {" "}
+        {showList.length > 0
+          ? showList.map((item, index) => {
+              const nowTime = new Date().valueOf();
+              const endTime = new Date(item.endTime).valueOf();
+              if (!canDelete) {
+                return (
+                  <>
+                    <OsList
+                      title={item.title}
+                      subTitle={
+                        item.description.length > 18
+                          ? item.description.substring(0, 17) + "..."
+                          : item.description
+                      }
+                      type="custom"
+                      rightIcon="arrows"
+                      onClick={() => {
+                        goToDetail(index);
+                      }}
+                    >
+                      {nowTime >= endTime ? (
+                        <OsTag type="primary" color="error">
+                          已截止
+                        </OsTag>
+                      ) : (
+                        <OsTag type="primary" color="#66CC66">
+                          进行中
+                        </OsTag>
+                      )}
+                    </OsList>
+                  </>
+                );
+              } else {
+                return (
+                  <OsCheckboxOption
+                    value={checkBoxValue}
+                    optionValue={item.id}
+                    onClick={setCheckBoxValue}
+                    customStyle={{
+                      backgroundColor: "#fff",
+                      paddingLeft: "6px",
+                    }}
+                  >
+                    {item.title}
+                  </OsCheckboxOption>
+                );
+              }
+            })
+          : null}
+      </OsCheckbox>
+
+      <OsModal
+        title="确认删除"
+        cancelText="取消"
+        confirmText="确定"
+        content={"确定要删除 " + checkBoxValue.length + " 个投票吗？"}
+        isShow={showBase}
+        onCancel={() => setShowBase(false)}
+        onClose={() => setShowBase(false)}
+        onConfirm={() => deleteVotes()}
+      ></OsModal>
+
+      <OsToast
+        isShow={show}
+        text={text}
+        onClose={() => setShow(false)}
+      ></OsToast>
     </>
   );
 };
