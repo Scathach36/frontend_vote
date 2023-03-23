@@ -28,7 +28,7 @@ export default () => {
     {
       icon: "home",
       selectedIcon: "home-pressed",
-      text: "首页",
+      text: "投票管理",
       path: "/pages/index/index",
     },
     {
@@ -49,12 +49,6 @@ export default () => {
     {
       icon: "home",
       selectedIcon: "home-pressed",
-      text: "首页",
-      path: "/pages/index/index",
-    },
-    {
-      icon: "subject",
-      selectedIcon: "subject-pressed",
       text: "投票管理",
       path: "/pages/index/index",
     },
@@ -63,6 +57,12 @@ export default () => {
       selectedIcon: "my-group-buying-select",
       text: "用户管理",
       path: "/pages/index/index",
+    },
+    {
+      icon: "subject",
+      selectedIcon: "subject-pressed",
+      text: "投票统计",
+      path: "/pages/voteCount/index",
     },
     {
       icon: "user",
