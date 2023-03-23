@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 const VoteCount = () => {
   const [voteList, setVoteList] = useState<any[]>([]);
   const [sortedVoteList, setSortedVoteList] = useState<any[]>([]);
+  const [showList, setShowList] = useState<any[]>([]);
   const data = Taro.getStorageSync("data");
 
   // token校验
@@ -32,6 +33,7 @@ const VoteCount = () => {
       return b.endTime < a.endTime ? -1 : 1;
     });
     setSortedVoteList(sortedList);
+    setShowList(sortedList);
   }, [voteList]);
 
   useEffect(() => {
@@ -47,16 +49,34 @@ const VoteCount = () => {
     });
   }, []);
 
+  // 标题查询
+  let time: any = null;
+  const searchByTiele = (e, value) => {
+    const reg = new RegExp(value);
+    let newList: any[] = [];
+    if (time !== null) {
+      clearTimeout(time);
+    }
+    time = setTimeout(() => {
+      sortedVoteList.forEach((item) => {
+        if (reg.test(item.title)) {
+          newList.push(item);
+        }
+      });
+      setShowList(newList);
+    }, 800);
+  };
+
   return (
     <View>
       <OsSearch
         placeholder="投票标题搜索"
         onChange={(e, value) => {
-          // searchByTiele(e, value);
+          searchByTiele(e, value);
         }}
       ></OsSearch>
-      {sortedVoteList.length > 0
-        ? sortedVoteList.map((item, index) => {
+      {showList.length > 0
+        ? showList.map((item, index) => {
             const nowTime = new Date().valueOf();
             const endTime = new Date(item.endTime).valueOf();
             return (
