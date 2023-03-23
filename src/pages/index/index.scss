@@ -20,3 +20,19 @@ page {
   border: 1px solid #fff;
   z-index: 999;
 }
+
+.btn_Delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  right: 40px;
+  bottom: 120px;
+  width: 70px;
+  height: 70px;
+  background-color: #7AC555;
+  color: #fff;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  z-index: 999;
+}
