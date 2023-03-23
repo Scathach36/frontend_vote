@@ -1,9 +1,10 @@
-import React from "react";
-import Taro from "@tarojs/taro";
+import React, { useEffect, useState } from "react";
+import Taro, { useRouter } from "@tarojs/taro";
 import { View } from "@tarojs/components";
 //@ts-ignore
 import * as echarts from "../../components/ec-canvas/echarts";
 import "./index.scss";
+import { OsList } from "ossaui";
 
 const initChart = (canvas, width, height) => {
   const chart = echarts.init(canvas, null, {
@@ -14,137 +15,114 @@ const initChart = (canvas, width, height) => {
   return chart;
 };
 
-const initPie = (canvas, width, height) => {
-  const chart = initChart(canvas, width, height);
-  const data = [
-    { value: 10, name: "已完成课程" },
-    { value: 90, name: "未完成课程" },
-  ];
-  const option = {
-    series: [
-      {
-        name: "访问来源",
-        type: "pie",
-        center: ["50%", "50%"],
-        radius: [0, "60%"],
-        data: data,
-        itemStyle: {
-          emphasis: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: "rgba(0, 0, 0, 0.5)",
-          },
-        },
-        label: {
-          formatter: "{c}",
-        },
-      },
-    ],
-    legend: {
-      data: ["已完成课程", "未完成课程"],
-      bottom: "bottom",
-    },
-  };
-  chart.setOption(option);
-  return chart;
-};
-const initLine = (canvas, width, height) => {
-  const chart = initChart(canvas, width, height);
-  const option = {
-    tooltip: {
-      trigger: "axis",
-    },
-    legend: {
-      data: ["已完成课程", "已完成作业"],
-      bottom: 0,
-    },
-    grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "10%",
-      containLabel: true,
-    },
-    xAxis: {
-      type: "category",
-      boundaryGap: false,
-      data: ["一月", "二月", "三月", "四月", "五月", "六月", "七月"],
-    },
-    yAxis: {
-      type: "value",
-    },
-    series: [
-      {
-        name: "已完成课程",
-        type: "line",
-        // stack: "Total",
-        data: [120, 132, 101, 134, 90, 230, 210],
-      },
-      {
-        name: "已完成作业",
-        type: "line",
-        // stack: "Total",
-        data: [220, 182, 191, 234, 290, 330, 310],
-      },
-    ],
-  };
-  chart.setOption(option);
-  return chart;
-};
+const Echarts = () => {
+  const router = useRouter();
+  const [options, setOptions] = useState<any[]>([]);
+  const [detail, setDetail] = useState<any>();
+  const [histogramX, setHistogramX] = useState<string[]>([]);
+  const [histogramData, setHistogramData] = useState<number[]>([]);
+  const [total, setTotal] = useState<number>(0);
 
-const initZhu = (canvas, width, height) => {
-  const chart = initChart(canvas, width, height);
-  const option = {
-    xAxis: {
-      data: ["选项选项A", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    },
-    yAxis: {},
-    series: [
-      {
-        type: "bar",
-        data: [2, 4, 8, 2, 7, 8, 5],
-      },
-    ],
-  };
-  chart.setOption(option);
-  return chart;
-};
+  const id = router.params.id;
 
-export default class Echarts extends React.Component {
-  state = {
-    ecPie: {
-      onInit: initPie,
-    },
-    ecLine: {
-      onInit: initLine,
-    },
-    ecZhu: {
-      onInit: initZhu,
-    },
+  // 柱状图初始化
+  const initHistogram = (canvas, width, height) => {
+    const chart = initChart(canvas, width, height);
+    const option = {
+      xAxis: {
+        data: histogramX,
+      },
+      yAxis: {},
+      series: [
+        {
+          type: "bar",
+          data: histogramData,
+        },
+      ],
+    };
+    chart.setOption(option);
+    return chart;
   };
-  render() {
-    return (
+  const ecHistogram = {
+    onInit: initHistogram,
+  };
+
+  useEffect(() => {
+    Taro.request({
+      url: "http://localhost:8080/vote/findById",
+      method: "POST",
+      data: { id: id },
+      success: (res) => {
+        setDetail(res.data.vote);
+      },
+    });
+    Taro.request({
+      url: "http://localhost:8080/vote/findOptionsByVoteId",
+      method: "POST",
+      data: { voteId: id },
+      success: (res) => {
+        setOptions(res.data.list);
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    let hisData: number[] = [];
+    let hisX: string[] = [];
+    let totalTickets = 0;
+    options.forEach((item) => {
+      totalTickets += item.number;
+      hisData.push(item.number);
+      hisX.push(item.description);
+    });
+
+    setTotal(totalTickets);
+    setHistogramData(hisData);
+    setHistogramX(hisX);
+  }, [options]);
+
+  return (
+    <>
+      {detail && (
+        <>
+          <OsList
+            title={detail.title}
+            desc={
+              (detail.multi == 0 ? "单选" : "多选") +
+              (detail.anonymous == 0 ? "" : "  匿名投票")
+            }
+          ></OsList>
+          {detail.description ? (
+            <OsList title="补充描述" subTitle={detail.description}></OsList>
+          ) : null}
+          <OsList title={"总票数：" + total + "票"}></OsList>
+        </>
+      )}
+      {options.length > 0 && (
+        <>
+          {options.map((item, index) => {
+            return (
+              <>
+                <OsList
+                  title={index + 1 + "." + item.description}
+                  desc={"票数：" + item.number + "票"}
+                ></OsList>
+              </>
+            );
+          })}
+        </>
+      )}
       <View className="echarts">
-        <ec-canvas
-          id="mychart-line"
-          canvas-id="myline"
-          ec={this.state.ecLine}
-        ></ec-canvas>
-        <ec-canvas
-          id="mychart-pie-course"
-          canvas-id="mypie"
-          ec={this.state.ecPie}
-        ></ec-canvas>
-        <ec-canvas
-          id="mychart-pie-homework"
-          canvas-id="mypie"
-          ec={this.state.ecPie}
-        ></ec-canvas>
-        <ec-canvas
-          id="mychart-zhu-test"
-          canvas-id="myzhu"
-          ec={this.state.ecZhu}
-        ></ec-canvas>
+        {histogramData.length > 0 && histogramX.length > 0 && (
+          <ec-canvas
+            id="mychart-histogram-test"
+            canvas-id="myHistogram"
+            ec={ecHistogram}
+          ></ec-canvas>
+        )}
       </View>
-    );
-  }
-}
+    </>
+  );
+};
+
+export default Echarts;

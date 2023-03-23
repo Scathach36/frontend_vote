@@ -82,6 +82,13 @@ const VoteCount = () => {
     }, 800);
   };
 
+  // 跳转echarts
+  const goToEcharts = (id) => {
+    Taro.navigateTo({
+      url: "/pages/echarts/index?id=" + id,
+    });
+  };
+
   return (
     <View>
       <OsSearch
@@ -91,7 +98,7 @@ const VoteCount = () => {
         }}
       ></OsSearch>
       {showList.length > 0
-        ? showList.map((item, index) => {
+        ? showList.map((item) => {
             const nowTime = new Date().valueOf();
             const endTime = new Date(item.endTime).valueOf();
             return (
@@ -106,7 +113,7 @@ const VoteCount = () => {
                   type="custom"
                   rightIcon="arrows"
                   onClick={() => {
-                    // goToDetail(index);
+                    goToEcharts(item.id);
                   }}
                 >
                   {nowTime >= endTime ? (
