@@ -56,7 +56,7 @@ export default () => {
       icon: "my-group-buying",
       selectedIcon: "my-group-buying-select",
       text: "用户管理",
-      path: "/pages/index/index",
+      path: "/pages/userManagement/index",
     },
     {
       icon: "subject",
