@@ -169,7 +169,7 @@ const login = () => {
       },
       success: (response) => {
         if (response.statusCode == 200) {
-          Taro.setStorageSync("data", { role: "0" });
+          Taro.setStorageSync("data", { role: "0", id: response.data });
           Taro.request({
             url: "http://localhost:8080/login/createToken",
             method: "POST",

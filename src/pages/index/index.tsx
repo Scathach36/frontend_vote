@@ -4,8 +4,10 @@ import {
   OsCheckbox,
   OsCheckboxOption,
   OsIcon,
+  OsInput,
   OsList,
   OsModal,
+  OsPicker,
   OsSearch,
   OsSwitch,
   OsTag,
@@ -22,8 +24,14 @@ const index = () => {
   const [canDelete, setCanDelete] = useState<boolean>(false);
   const [checkBoxValue, setCheckBoxValue] = useState<number[]>([]);
   const [showBase, setShowBase] = useState<boolean>(false);
+  const [newUser, setNewUser] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
   const [text, setText] = useState<string>("");
+  const [range, setRange] = useState<string[]>([]);
+  const [vNormal, setVNormal] = useState<any>(0);
+  const [classNumber, setClassNumber] = useState<string>("");
+  const [studentNumber, setStudentNumber] = useState<string>("");
+  const [name, setName] = useState<string>("");
 
   // token校验
   useEffect(() => {
@@ -93,9 +101,19 @@ const index = () => {
     initVoteList();
   });
 
+  useEffect(() => {
+    setClassNumber(range[vNormal]);
+  }, [range]);
+
   // 首次进入、刷新触发
   useEffect(() => {
     initVoteList();
+    Taro.request({
+      url: "http://localhost:8080/class/getClass",
+      method: "GET",
+    }).then((res) => {
+      setRange(res.data.data.classNumber);
+    });
   }, []);
 
   // voteList数组监控
@@ -106,6 +124,55 @@ const index = () => {
     setSortedVoteList(sortedList);
     setShowList(sortedList);
   }, [voteList]);
+
+  // 判断是否为新注册的微信用户
+  useEffect(() => {
+    const isNew = Taro.getStorageSync("new");
+    if (isNew) {
+      setNewUser(true);
+    }
+  }, []);
+
+  // 绑定信息
+  const bindUserInfo = () => {
+    if (!studentNumber || !name) {
+      setText("内容不能为空！");
+      setShow(true);
+    } else {
+      const data = {
+        id: Taro.getStorageSync("data").id,
+        name,
+        number: studentNumber,
+        classNumber,
+      };
+      Taro.request({
+        url: "http://localhost:8080/user/bindUser",
+        method: "POST",
+        data,
+        success: (res) => {
+          console.log(res);
+          if (res.data.code == 200) {
+            Taro.removeStorageSync("new");
+            const data = Taro.getStorageSync("data");
+            Taro.removeStorageSync("data");
+            Taro.setStorageSync("data", {
+              id: data.id,
+              role: data.role,
+              name,
+              number: studentNumber,
+              classNumber,
+            });
+            setText("用户信息绑定成功！");
+            setShow(true);
+            setNewUser(false);
+          } else {
+            setText(res.data.msg);
+            setShow(true);
+          }
+        },
+      });
+    }
+  };
 
   //添加新投票
   const addVote = () => {
@@ -176,6 +243,7 @@ const index = () => {
           <OsList title="批量删除" customStyle={{ marginBottom: "10px" }}>
             <OsSwitch checked={canDelete} onChange={setCanDelete}></OsSwitch>
           </OsList>
+          <OsList title="模板"></OsList>
         </>
       )}
       <OsCheckbox>
@@ -247,6 +315,49 @@ const index = () => {
         text={text}
         onClose={() => setShow(false)}
       ></OsToast>
+
+      <OsModal
+        confirmText="确定"
+        closeable={false}
+        closeOnClickMask={true}
+        isShow={newUser}
+        onCancel={() => setNewUser(false)}
+        onClose={() => setNewUser(false)}
+        onConfirm={bindUserInfo}
+        className="custom-demo"
+      >
+        <View>
+          <OsList title="信息绑定"></OsList>
+          <OsPicker
+            range={range}
+            value={vNormal}
+            onConfirm={(index) => {
+              setClassNumber(range[vNormal]);
+              setVNormal(index);
+            }}
+          >
+            <OsList title="班级" desc={range[vNormal]}></OsList>
+          </OsPicker>
+          <OsInput
+            label="学号"
+            placeholder="请输入学号"
+            placeholderStyle="color: #7f7f7f;"
+            value={studentNumber}
+            onChange={(v) => {
+              setStudentNumber(v);
+            }}
+          ></OsInput>
+          <OsInput
+            label="姓名"
+            placeholder="请输入姓名"
+            placeholderStyle="color: #7f7f7f;"
+            value={name}
+            onChange={(v) => {
+              setName(v);
+            }}
+          ></OsInput>
+        </View>
+      </OsModal>
     </>
   );
 };
